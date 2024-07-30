@@ -158,11 +158,11 @@ def make_inference(idx):
     t2 = time.time()
     t = t2 - t1
     return image, pred_keypoints, keypoints, loss, t
-#
-# mi_t = np.empty(0)
-# for i in np.random.randint(0, len(val_data), 20):
-#     image, pred_keypoints, keypoints, loss, t = make_inference(i)
-#     mi_t = np.append(mi_t, t)
+
+mi_t = np.empty(0)
+for i in np.random.randint(0, len(val_data), 20):
+    image, pred_keypoints, keypoints, loss, t = make_inference(i)
+    mi_t = np.append(mi_t, t)
 # #     print('orig: ', keypoints)
 # #     print("predict: ", pred_keypoints)
 
@@ -219,6 +219,7 @@ for i in np.random.randint(0, len(val_data), 20):
     # print(f"ORT inference Duration work = {t2 - t1}")
     # print('orig: ', keypoints)
     # print("predict: ", output_tensors)
-# print('make_inference inference: ', np.mean(mi_t))
+
+print('make_inference inference: ', np.mean(mi_t))
 print('OpenCV Python API inference: ', np.mean(CV))
 print('OnnxRuntime inference: ', np.mean(ORT))
