@@ -163,8 +163,8 @@ mi_t = np.empty(0)
 for i in np.random.randint(0, len(val_data), 20):
     image, pred_keypoints, keypoints, loss, t = make_inference(i)
     mi_t = np.append(mi_t, t)
-# #     print('orig: ', keypoints)
-# #     print("predict: ", pred_keypoints)
+#     print('orig: ', keypoints)
+#     print("predict: ", pred_keypoints)
 
 CV = np.empty(0)
 for i in np.random.randint(0, len(val_data), 20):
@@ -220,6 +220,29 @@ for i in np.random.randint(0, len(val_data), 20):
     # print('orig: ', keypoints)
     # print("predict: ", output_tensors)
 
-print('make_inference inference: ', np.mean(mi_t))
-print('OpenCV Python API inference: ', np.mean(CV))
-print('OnnxRuntime inference: ', np.mean(ORT))
+from openvino.runtime import Core
+
+ie = Core()
+
+model_onnx = ie.read_model(model=onnx_model_path)
+compiled_model = ie.compile_model(model=model_onnx, device_name="CPU")
+input_layer = compiled_model.input(0)
+output_layer = compiled_model.output(0)
+
+OV = np.empty(0)
+for i in np.random.randint(0, len(val_data), 20):
+    image, keypoints = val_data[i]
+    input_data = np.expand_dims(image[0], axis=(0, 1)).astype(np.float32)
+
+    t1 = time.time()
+    request = compiled_model.create_infer_request()
+    request.infer(inputs={input_layer.any_name: input_data})
+    result = request.get_output_tensor(output_layer.index).data
+    t2 = time.time()
+    OV = np.append(OV, t2 - t1)
+    print(i, result, keypoints)
+
+# print('make_inference inference: ', np.mean(mi_t))
+# print('OpenCV Python API inference: ', np.mean(CV))
+# print('OnnxRuntime inference: ', np.mean(ORT))
+# print('OpenVINO inference: ', np.mean(OV))
