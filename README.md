@@ -81,13 +81,17 @@ OpenVINO inference:  0.032 c
   * [ ] Загрузить модель из Onnx
   
     `model_onnx = ie.read_model(model=onnx_model_path)`
+
     `compiled_model = ie.compile_model(model=model_onnx, device_name="CPU")`
   * [ ] Определить входные и выходные данные
         
     `input_layer = compiled_model.input(0)`
+
     `output_layer = compiled_model.output(0)`
   * [ ] Запустить модель
  
     `request = compiled_model.create_infer_request()`
+
     `request.infer(inputs={input_layer.any_name: input_data})`
+
     `result = request.get_output_tensor(output_layer.index).data`
